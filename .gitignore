@@ -1,0 +1,6 @@
+.cache/
+.direnv/
+*.elf
+*.hex
+*.o
+*.json
