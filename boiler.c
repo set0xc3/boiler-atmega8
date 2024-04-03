@@ -304,7 +304,6 @@ static Error   error_flags = Error_None;
 static Mode    mode        = MODE_STOP;
 static State   last_state, state = STATE_HOME;
 static Options options;
-static Option  current_option1, current_option2;
 static Option  option_temp_target;
 
 // Temp
@@ -515,14 +514,7 @@ main(void)
       }
     }
 
-    {
-      static Timer32 timer;
-      if (timer_expired_ext(&timer, 0, 0, 10, s_ticks)) {
-        handle_buttons();
-        current_option1.value = options.e[menu_idx].value % 100 / 10;
-        current_option2.value = options.e[menu_idx].value % 10;
-      }
-    }
+    handle_buttons();
 
     if (timer_out_menu_enabled
         && timer_expired_ext(&timer_out_menu, SECONDS(5), 0, 0, s_ticks)
@@ -566,8 +558,6 @@ main(void)
         if (timer_expired_ext(&timer_menu, 0, 0, 250, s_ticks)) {
           display_enable ^= 1;
         }
-      } else {
-        display_enable = 1;
       }
 
       if (state == STATE_HOME) {
@@ -1316,8 +1306,9 @@ ISR(TIMER0_OVF_vect)
                    display_segment_menu[menu_idx][1]);
       break;
     case STATE_MENU_PARAMETERS:
-      display_menu(display_segment_numbers[current_option1.value],
-                   display_segment_numbers[current_option2.value]);
+      display_menu(
+          display_segment_numbers[options.e[menu_idx].value % 100 / 10],
+          display_segment_numbers[options.e[menu_idx].value % 10]);
       break;
     default:
       break;
