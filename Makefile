@@ -1,32 +1,28 @@
-# Compiler
+# Compiler and flags
 CC = avr-gcc
 OBJCOPY = avr-objcopy
+SIZE = avr-size
+CFLAGS = -mmcu=atmega8 -DF_CPU=1000000UL -Wall -Os -std=gnu11 --param=min-pagesize=0 -I${AVR_PATH}/include
 
-# Compiler flags
-CFLAGS = -mmcu=atmega8 -DF_CPU=100000UL -Wall -g -Os -std=gnu11 --param=min-pagesize=0 -I${AVR_PATH}/include
+FIRMWARE_NAME = boiler
 
-# Source files
-SRC = boiler.c
+.PHONY: build clean
 
-# Object files
-OBJ = $(SRC:.c=.o)
+all: clean build
 
-# Executable name
-TARGET = boiler.elf
-HEX = boiler.hex
+build: $(FIRMWARE_NAME).bin
 
-.PHONY: all clean
+$(FIRMWARE_NAME).bin: $(FIRMWARE_NAME).elf
+	$(OBJCOPY) $< -O ihex $@
 
-all: $(TARGET) $(HEX)
+$(FIRMWARE_NAME).elf: $(FIRMWARE_NAME).c
+	$(CC) $< -o $@ $(CFLAGS)
 
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@
+size: $(FIRMWARE_NAME).elf
+	$(SIZE) $<
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(HEX): $(TARGET)
-	$(OBJCOPY) -O ihex $< $@
+flash: $(FIRMWARE_NAME).bin
+	 avrdude -c usbasp -p m8 -U flash:w:$<:a
 
 clean:
-	rm -f $(OBJ) $(TARGET) $(HEX)
+	rm -f *.elf *.bin

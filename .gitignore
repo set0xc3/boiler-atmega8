@@ -1,6 +1,9 @@
 .cache/
 .direnv/
+
 *.elf
+*.bin
 *.hex
 *.o
-*.json
+
+compile_commands.json

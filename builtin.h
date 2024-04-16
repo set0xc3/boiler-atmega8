@@ -1,5 +1,5 @@
-#ifndef BASE_H
-#define BASE_H
+#ifndef BUILTIN_H
+#define BUILTIN_H
 
 #include <stdint.h>
 
